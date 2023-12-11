@@ -1,0 +1,135 @@
+# path of source code
+local-workspace: /path/to/your/lumina/project/lumina/
+
+# path of results
+result-path: /path/to/your/results/
+
+# file name of aggregated pcap
+aggregate-pcap-filename: merge.pcap
+
+# rewrite udp dst port for roce packets (4791-->9741)
+rewrite-udp-dst-port: 9741
+
+# number of times to run this experiment
+num-repeats: 5
+
+# switch config
+switch:
+  sde-path: /path/to/bf-sde/on/switch/ # the path where bf sde is installed
+  workspace: /path/to/lumina/code/on/switch/ # the path where the lumina code and results are placed
+  control-ip: 192.168.1.11 # the control ip of switch
+  username: user # username of switch
+  ssh-key-filepath: /home/foobar/.ssh/id_rsa # the private key path; the public key should be put to the remote side's authorized_keys
+  port-speed: 100G # port speed for all the ports involved in the test
+  fec-type: RS # fec type for all the ports involved in the test
+  listen-port: 12345 # The port to listen (during the test, communicating with the traffic generator)
+  local-switch-config-path: /path/to/your/switch-config.yml # Lumina will generate a switch config file there
+
+# server configs
+requester:
+  workspace: /path/to/lumina/code/on/server/ # the path where the lumina code and results are placed
+  control-ip: 192.168.1.12 # the control ip of requester
+  username: user # username of requester
+  ssh-key-filepath: /home/foobar/.ssh/id_rsa # the private key path; the public key should be put to the remote side's authorized_keys
+  nic:
+    type: CX6 # The NIC type to test; we support: CX4, CX5, CX6, E810
+    if-name: ens1 # The interface name of the NIC
+    pci-addr: "03:00.0" # The pcie address of the NIC
+    ib-device: mlx5_0 # The ib device name of the RNIC
+    ib-port: 1 # The ib port
+    switch-port: 132 # The port number of the switch port that this NIC is connected to
+    ip-list: # The ip addresses on the NIC
+      - 10.0.0.1/24
+      - 10.0.0.11/24
+      - 10.0.0.21/24
+      - 10.0.0.31/24
+  roce-parameters: # RoCE parameters
+    dcqcn-rp-enable: False
+    dcqcn-np-enable: True
+    min-time-between-cnps: 0
+    adaptive-retrans: False
+    slow-restart: True
+
+responder:
+  workspace: /path/to/lumina/code/on/server/
+  control-ip: 192.168.1.13
+  username: user
+  ssh-key-filepath: /home/foobar/.ssh/id_rsa
+  nic:
+    type: CX6
+    if-name: ens1
+    pci-addr: "03:00.0"
+    ib-device: mlx5_0
+    ib-port: 1
+    switch-port: 140
+    ip-list:
+      - 10.0.0.2/24
+      - 10.0.0.12/24
+      - 10.0.0.22/24
+      - 10.0.0.32/24
+  roce-parameters:
+    dcqcn-rp-enable: True
+    dcqcn-np-enable: True
+    min-time-between-cnps: 0
+    adaptive-retrans: False
+    slow-restart: True
+
+requester-mirror:
+  workspace: /path/to/lumina/code/on/mirror-server/
+  control-ip: 192.168.1.14
+  username: user
+  ssh-key-filepath: /home/foobar/.ssh/id_rsa
+  pkt-dump-conf: # Config for packet dump program
+    dump-filename: requester.pcap # The pcap filename
+    snap-len: 128 # The maximum packet length for each packet (We are interested in the headers only)
+    num-pkts: 16383 # The maximum number of packets to capture
+  nic:
+    if-name: ens1
+    pci-addr: "03:00.0"
+    switch-port: 148
+    rte-port-id: 0
+
+responder-mirror:
+  workspace: /path/to/lumina/code/on/mirror-server/
+  control-ip: 192.168.1.15
+  username: user
+  ssh-key-filepath: /home/foobar/.ssh/id_rsa
+  pkt-dump-conf:
+    dump-filename: responder.pcap
+    snap-len: 128
+    num-pkts: 16383
+  nic:
+    if-name: ens1
+    pci-addr: "03:00.0"
+    switch-port: 156
+    rte-port-id: 0
+
+traffic:
+  num-qps: 4 # Number of connections
+  rdma-verb: write # The rdma verb of the traffic
+  num-msgs-per-qp: 1 # Number of messages to send per connection
+  mtu: 1024 # MTU
+  message-size: 1024000 # Size of each message
+  listen-port: 13579 # The port 
+  multi-gid: true # Whether to enable multi GID
+  barrier-sync: false # Whether to enable barrier synchronization between the connections
+  tx-depth: 1 # Tx depth
+  min-retransmit-timeout: 14 # Min retransmission delay for timeout retransmission; the actual time calculation is 4.096*2^min-retransmit-timeout(check spec for detailed descripsion) 
+  max-retransmit-retry: 7 # Max number of try for timeout retransmission
+  data-pkt-events: # A list of events to inject
+    - qpn:  0   # The (relative) QP number to inject event; the number starts from 0
+      psn:  4   # The (relative) packet sequence number of the target packet; the number starts from 0
+      type: ecn # The type of event
+      iter: 1   # The "iteration" number of the target packet; maintained by switch (check our paper for more details); the number starts from 1
+    - qpn:  1
+      psn:  4
+      type: ecn
+      iter: 1
+    - qpn:  2
+      psn:  3
+      type: drop
+      iter: 1
+    - qpn:  3
+      psn:  5
+      type: drop
+      iter: 1
