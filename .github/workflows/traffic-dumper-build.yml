@@ -16,7 +16,7 @@ on:
             - 'lumina/roce-pkt-dump/**'
 
 env:
-    DOCKER_USERNAME: "lumina-user"
+    DOCKER_USERNAME: lumina-user
 
 jobs:
     build:
