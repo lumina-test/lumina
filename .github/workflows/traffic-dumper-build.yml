@@ -39,4 +39,4 @@ jobs:
                     docker-ubuntu-with-dpdk \
                     bash -c \
                     "sudo chown -R $DOCKER_USERNAME /home/$DOCKER_USERNAME/roce-pkt-dump/ && \
-                    cd /home/$DOCKER_USERNAME/roce-pkt-dump && make"
+                    cd /home/$DOCKER_USERNAME/roce-pkt-dump && make clean && make"
