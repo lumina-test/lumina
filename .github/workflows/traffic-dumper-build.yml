@@ -27,4 +27,4 @@ jobs:
 
             - name: Build Traffic Dumper
               run: |
-                    docker run --rm -v $PWD:/lumina/roce-pkt-dump -w /roce-pkt-dump docker-ubuntu-with-dpdk make
+                    docker run --rm -v $PWD:/lumina/roce-pkt-dump -w /roce-pkt-dump docker-ubuntu-with-dpdk bash -c "cd /roce-pkt-dump && make"
