@@ -27,26 +27,20 @@ jobs:
 
             - name: Build Docker image with DPDK installed
               run: |
-                if ["$USER" -eq ""]; then
-                    USER=$(id -un)
-                fi
-                if [ "$UID" -eq 0 ]; then
-                    UID=$(id -u)
-                fi
-                if [ "$GUID" -eq 0 ]; then
-                    GUID=$(id -g)
-                fi
+                USER_NAME=$(id -un)
+                USER_ID=$(id -u)
+                GROUP_ID=$(id -g)
                 docker build -t $DOCKER_IMAGE_NAME \
                     -f dockerfiles/Dockerfile.dpdk \
-                    --build-arg USER="$USER" \
-                    --build-arg UID="$UID" \
-                    --build-arg GUID="$GUID" \
+                    --build-arg USER="$USER_NAME" \
+                    --build-arg UID="$USER_ID" \
+                    --build-arg GID="$GROUP_ID" \
                     .
 
             - name: Start Docker container and build traffic dumper
               run: |
                 docker run --rm \
-                    -v ./lumina/roce-pkt-dump:/home/$USER/roce-pkt-dump \
+                    -v ./lumina/roce-pkt-dump:/home/$USER_NAME/roce-pkt-dump \
                     $DOCKER_IMAGE_NAME \
                     bash -c \
-                    "cd /home/$USER/roce-pkt-dump; make clean; make"
+                    "cd /home/$USER_NAME/roce-pkt-dump; make clean; make"

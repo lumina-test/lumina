@@ -4,7 +4,7 @@ FROM ubuntu:$UBUNTU_VERSION
 
 ARG USER
 ARG UID
-ARG GUID
+ARG GID
 ARG PASSWORD=password
 ARG DPDK_VERSION=20.11.9
 ARG DPDK_FILE=dpdk-$DPDK_VERSION.tar.xz
@@ -33,8 +33,8 @@ RUN apt-get update && apt-get install -y \
     && pip3 install meson
 
 # Add a group and user
-RUN groupadd -f -r -g $GUID g$USER
-RUN useradd $USER -l -u $UID -g $GUID -d /home/$USER -m -s /bin/bash && \
+RUN groupadd -f -r -g $GID g$USER
+RUN useradd $USER -l -u $UID -g $GID -d /home/$USER -m -s /bin/bash && \
     echo "$USER:$PASSWORD" | chpasswd && \
     echo "$USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
