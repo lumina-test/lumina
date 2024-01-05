@@ -1,1 +1,24 @@
+name: traffic-dumper-build
 
+on:
+    push:
+        branches: ["**"]
+        paths:
+            - '.github/workflows/traffic-dumper-build.yml'
+            - 'dockerfiles/Dockerfile.dpdk'
+    pull_request:
+        branches: ["**"]
+        paths:
+            - '.github/workflows/traffic-dumper-build.yml'
+            - 'dockerfiles/Dockerfile.dpdk'
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v2
+
+            - name: Build Docker image with DPDK installed
+              run: |
+                    docker build -t docker-ubuntu-with-dpdk -f dockerfiles/Dockerfile.dpdk .
