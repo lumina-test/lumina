@@ -2,11 +2,13 @@ ARG UBUNTU_VERSION=20.04
 
 FROM ubuntu:$UBUNTU_VERSION
 
-ARG USERNAME=admin
+ARG USER
+ARG UID
+ARG GUID
 ARG PASSWORD=password
 ARG DPDK_VERSION=20.11.9
 ARG DPDK_FILE=dpdk-$DPDK_VERSION.tar.xz
-ARG DPDK_HOME=/home/$USERNAME/dpdk
+ARG DPDK_HOME=/home/$USER/dpdk
 ARG BUILD_CPU_CORES=4
 
 # Set environment variables (optional)
@@ -30,16 +32,20 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/* \
     && pip3 install meson
 
-# Add a user with sudo privileges
-RUN useradd -m -s /bin/bash $USERNAME && \
-    echo "$USERNAME:$PASSWORD" | chpasswd && \
-    echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+# Add a group and user
+RUN groupadd -f -r -g $GUID g$USER
+RUN useradd $USER -l -u $UID -g $GUID -d /home/$USER -m -s /bin/bash && \
+    echo "$USER:$PASSWORD" | chpasswd && \
+    echo "$USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Change the owner of the home directory
+RUN chown -R $USER /home/$USER
 
 # Set the user
-USER $USERNAME
+USER $USER
 
 # Download DPDK
-RUN cd /home/$USERNAME \
+RUN cd /home/$USER \
     && wget http://fast.dpdk.org/rel/$DPDK_FILE \
     && mkdir --parents $DPDK_HOME \
     && tar -xvf $DPDK_FILE -C $DPDK_HOME --strip-components 1 \
@@ -54,7 +60,7 @@ RUN cd $DPDK_HOME \
   && sudo ldconfig
 
 # Specify the working directory (optional)
-WORKDIR /home/$USERNAME
+WORKDIR /home/$USER
 
 # Entry point for the container (optional)
 CMD ["bash"]

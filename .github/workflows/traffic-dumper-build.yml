@@ -16,7 +16,7 @@ on:
             - 'lumina/roce-pkt-dump/**'
 
 env:
-    DOCKER_USERNAME: lumina-user
+    DOCKER_IMAGE_NAME: docker-ubuntu-with-dpdk
 
 jobs:
     build:
@@ -27,16 +27,21 @@ jobs:
 
             - name: Build Docker image with DPDK installed
               run: |
-                    docker build -t docker-ubuntu-with-dpdk \
+                    USER=$(id -un)
+                    UID=$(id -u)
+                    GUID=$(id -g)
+                    docker build -t $DOCKER_IMAGE_NAME \
                     -f dockerfiles/Dockerfile.dpdk \
-                    --build-arg="USERNAME=$DOCKER_USERNAME" \
+                    --build-arg USER="$USER" \
+                    --build-arg UID="$UID" \
+                    --build-arg GUID="$GUID" \
                     .
 
             - name: Start Docker container and build traffic dumper
               run: |
+                    USER=$(id -un)
                     docker run --rm \
-                    -v ./lumina/roce-pkt-dump:/home/$DOCKER_USERNAME/roce-pkt-dump \
-                    docker-ubuntu-with-dpdk \
+                    -v ./lumina/roce-pkt-dump:/home/$USER/roce-pkt-dump \
+                    $DOCKER_IMAGE_NAME \
                     bash -c \
-                    "sudo chown -R $DOCKER_USERNAME /home/$DOCKER_USERNAME/roce-pkt-dump/ && \
-                    cd /home/$DOCKER_USERNAME/roce-pkt-dump && make clean && make"
+                    "cd /home/$USER/roce-pkt-dump; make clean; make"
