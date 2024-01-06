@@ -5,18 +5,18 @@ on:
         branches: ["**"]
         paths:
             - '.github/workflows/traffic-generator-build.yml'
-            - 'dockerfiles/Dockerfile.ofed'
+            - 'dockerfiles/Dockerfile.libibverbs'
             - 'lumina/my-ib-traffic-gen/**'
 
     pull_request:
         branches: ["**"]
         paths:
             - '.github/workflows/traffic-generator-build.yml'
-            - 'dockerfiles/Dockerfile.ofed'
+            - 'dockerfiles/Dockerfile.libibverbs'
             - 'lumina/my-ib-traffic-gen/**'
 
 env:
-    DOCKER_IMAGE_NAME: docker-ubuntu-with-ofed
+    DOCKER_IMAGE_NAME: docker-ubuntu-with-libibverbs
 
 jobs:
     build:
@@ -25,13 +25,13 @@ jobs:
             - name: Checkout Repository
               uses: actions/checkout@v2
 
-            - name: Build Docker image with OFED installed
+            - name: Build Docker image with libibverbs library installed
               run: |
                 USER_NAME=$(id -un)
                 USER_ID=$(id -u)
                 GROUP_ID=$(id -g)
                 docker build -t $DOCKER_IMAGE_NAME \
-                    -f dockerfiles/Dockerfile.ofed \
+                    -f dockerfiles/Dockerfile.libibverbs \
                     --build-arg USER="$USER_NAME" \
                     --build-arg UID="$USER_ID" \
                     --build-arg GID="$GROUP_ID" \

@@ -1,0 +1,36 @@
+ARG UBUNTU_VERSION=20.04
+
+FROM ubuntu:$UBUNTU_VERSION
+
+ARG USER
+ARG UID
+ARG GID
+ARG PASSWORD=password
+
+
+# Set environment variables (optional)
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install necessary packages
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libibverbs-dev \
+    wget \
+    sudo \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+# Add a group and user
+RUN groupadd -f -r -g $GID g$USER
+RUN useradd $USER -l -u $UID -g $GID -d /home/$USER -m -s /bin/bash && \
+    echo "$USER:$PASSWORD" | chpasswd && \
+    echo "$USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Change the owner of the home directory
+RUN chown -R $USER /home/$USER
+
+# Specify the working directory (optional)
+WORKDIR /home/$USER
+
+# Entry point for the container (optional)
+CMD ["bash"]
