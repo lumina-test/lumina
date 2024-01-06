@@ -17,11 +17,10 @@ on:
 
 env:
     DOCKER_IMAGE_NAME: docker-ubuntu-with-ofed
-    UBUNTU_VERSION: 22.04
 
 jobs:
     build:
-        runs-on: ubuntu-$UBUNTU_VERSION
+        runs-on: ubuntu-latest
         steps:
             - name: Checkout Repository
               uses: actions/checkout@v2
@@ -36,7 +35,6 @@ jobs:
                     --build-arg USER="$USER_NAME" \
                     --build-arg UID="$USER_ID" \
                     --build-arg GID="$GROUP_ID" \
-                    --build-arg UBUNTU_VERSION="$UBUNTU_VERSION" \
                     .
 
             - name: Start Docker container and build RDMA traffic generator
