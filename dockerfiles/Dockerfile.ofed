@@ -13,13 +13,14 @@ ARG ARCH=x86_64
 ARG OFED_FILE=MLNX_OFED_LINUX-$OFED_VERSION-ubuntu$UBUNTU_VERSION-$ARCH.tgz
 ARG OFED_HOME=/home/$USER/MLNX_OFED_LINUX-$OFED_VERSION-ubuntu$UBUNTU_VERSION-$ARCH
 ARG OFED_URL=https://content.mellanox.com/ofed/MLNX_OFED-$OFED_VERSION/$OFED_FILE
+ARG KERNEL_VERSION=5.4.0-165-generic
 
 # Set environment variables (optional)
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install necessary packages
 RUN apt-get update \
-    && apt-get install -y wget sudo apt-utils perl pkg-config libcap2 \
+    && apt-get install -y wget sudo apt-utils perl pkg-config libcap2 linux-headers-KERNEL_VERSION \
     && rm -rf /var/lib/apt/lists/*
 
 # Add a group and user
@@ -43,7 +44,7 @@ RUN cd /home/$USER \
 # Install OFED
 RUN cd $OFED_HOME \
     && ls -la \
-    && sudo ./mlnxofedinstall --force \
+    && sudo ./mlnxofedinstall --without-dkms --add-kernel-support --kernel $KERNEL_VERSION --without-fw-update --force \
     && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Specify the working directory (optional)
