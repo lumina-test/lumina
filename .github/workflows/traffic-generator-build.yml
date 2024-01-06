@@ -17,7 +17,7 @@ on:
 
 env:
     DOCKER_IMAGE_NAME: docker-ubuntu-with-ofed
-    UBUNTU_VERSION: 20.04
+    UBUNTU_VERSION: 22.04
 
 jobs:
     build:
