@@ -1,0 +1,54 @@
+ARG UBUNTU_VERSION=20.04
+
+FROM ubuntu:$UBUNTU_VERSION
+
+ARG USER
+ARG UID
+ARG GUID
+ARG PASSWORD=password
+
+ARG UBUNTU_VERSION
+ARG OFED_VERSION=5.8-1.1.2.1
+ARG ARCH=x86_64
+ARG OFED_FILE=MLNX_OFED_LINUX-$OFED_VERSION-ubuntu$UBUNTU_VERSION-$ARCH.tgz
+ARG OFED_HOME=/home/$USER/MLNX_OFED_LINUX-$OFED_VERSION-ubuntu$UBUNTU_VERSION-$ARCH
+ARG OFED_URL=https://content.mellanox.com/ofed/MLNX_OFED-$OFED_VERSION/$OFED_FILE
+
+# Set environment variables (optional)
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install necessary packages
+RUN apt-get update \
+    && apt-get install -y wget sudo apt-utils linux-headers-$(uname -r) perl pkg-config libcap2 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Add a group and user
+RUN groupadd -f -r -g $GUID g$USER
+RUN useradd $USER -l -u $UID -g $GUID -d /home/$USER -m -s /bin/bash && \
+    echo "$USER:$PASSWORD" | chpasswd && \
+    echo "$USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Change the owner of the home directory
+RUN chown -R $USER /home/$USER
+
+# Set the user
+USER $USER
+
+# Download OFED
+RUN cd /home/$USER \
+    && wget $OFED_URL \
+    && tar -xzf $OFED_FILE \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Install OFED
+RUN cd $OFED_HOME \
+    && ls -la \
+    && sudo ./mlnxofedinstall --without-dkms --add-kernel-support --kernel $(uname -r) --without-fw-update --force \
+    && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && sudo /etc/init.d/openibd restart
+
+# Specify the working directory (optional)
+WORKDIR /home/$USER
+
+# Entry point for the container (optional)
+CMD ["bash"]
