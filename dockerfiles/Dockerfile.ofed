@@ -43,7 +43,7 @@ RUN cd /home/$USER \
 # Install OFED
 RUN cd $OFED_HOME \
     && ls -la \
-    && sudo ./mlnxofedinstall --without-fw-update --force \
+    && sudo ./mlnxofedinstall --without-fw-update \
     && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Specify the working directory (optional)
