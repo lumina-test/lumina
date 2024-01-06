@@ -19,7 +19,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install necessary packages
 RUN apt-get update \
-    && apt-get install -y wget sudo apt-utils linux-headers-$(uname -r) perl pkg-config libcap2 \
+    && apt-get install -y wget sudo apt-utils perl pkg-config libcap2 \
+    && [ -d /usr/src/linux-headers-$(uname -r) ] || sudo apt-get install -y linux-headers-$(uname -r) \
     && rm -rf /var/lib/apt/lists/*
 
 # Add a group and user
