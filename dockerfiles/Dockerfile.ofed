@@ -20,7 +20,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install necessary packages
 RUN apt-get update \
-    && apt-get install -y wget sudo apt-utils perl pkg-config libcap2 linux-headers-KERNEL_VERSION \
+    && apt-get install -y wget sudo apt-utils perl pkg-config libcap2 linux-headers-$KERNEL_VERSION \
     && rm -rf /var/lib/apt/lists/*
 
 # Add a group and user
