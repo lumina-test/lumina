@@ -20,7 +20,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install necessary packages
 RUN apt-get update \
     && apt-get install -y wget sudo apt-utils perl pkg-config libcap2 \
-    && [ -d /usr/src/linux-headers-$(uname -r) ] || sudo apt-get install -y linux-headers-$(uname -r) \
     && rm -rf /var/lib/apt/lists/*
 
 # Add a group and user
@@ -44,7 +43,7 @@ RUN cd /home/$USER \
 # Install OFED
 RUN cd $OFED_HOME \
     && ls -la \
-    && sudo ./mlnxofedinstall --without-dkms --add-kernel-support --kernel $(uname -r) --without-fw-update --force \
+    && sudo ./mlnxofedinstall --without-fw-update --force \
     && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Specify the working directory (optional)
