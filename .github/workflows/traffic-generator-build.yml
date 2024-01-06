@@ -31,7 +31,7 @@ jobs:
                 USER_ID=$(id -u)
                 GROUP_ID=$(id -g)
                 docker build -t $DOCKER_IMAGE_NAME \
-                    -f dockerfiles/Dockerfile.dpdk \
+                    -f dockerfiles/Dockerfile.ofed \
                     --build-arg USER="$USER_NAME" \
                     --build-arg UID="$USER_ID" \
                     --build-arg GID="$GROUP_ID" \
