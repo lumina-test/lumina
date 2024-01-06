@@ -44,8 +44,7 @@ RUN cd /home/$USER \
 RUN cd $OFED_HOME \
     && ls -la \
     && sudo ./mlnxofedinstall --without-dkms --add-kernel-support --kernel $(uname -r) --without-fw-update --force \
-    && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-    && sudo /etc/init.d/openibd restart
+    && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Specify the working directory (optional)
 WORKDIR /home/$USER
