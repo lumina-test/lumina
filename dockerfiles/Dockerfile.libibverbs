@@ -29,6 +29,9 @@ RUN useradd $USER -l -u $UID -g $GID -d /home/$USER -m -s /bin/bash && \
 # Change the owner of the home directory
 RUN chown -R $USER /home/$USER
 
+# Set the user
+USER $USER
+
 # Specify the working directory (optional)
 WORKDIR /home/$USER
 
